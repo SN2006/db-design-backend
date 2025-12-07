@@ -1,6 +1,6 @@
 package com.example.app.dbdesignbackend.validation.annotation;
 
-import com.example.app.dbdesignbackend.validation.impl.IsoPeriodValidator;
+import com.example.app.dbdesignbackend.validation.impl.IsoDurationValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,11 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = IsoPeriodValidator.class)
+@Constraint(validatedBy = IsoDurationValidator.class)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IsoPeriod {
-    String message() default "Invalid ISO 8601 period format";
+public @interface IsoDuration {
+    String message() default "Invalid ISO 8601 duration format";
 
     Class<?>[] groups() default {};
 

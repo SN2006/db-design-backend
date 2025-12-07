@@ -2,6 +2,7 @@ package com.example.app.dbdesignbackend.dao;
 
 import com.example.app.dbdesignbackend.db.DBConnectionHolder;
 import com.example.app.dbdesignbackend.dto.CreateHomeworkDTO;
+import com.example.app.dbdesignbackend.dto.HomeworkDTO;
 import com.example.app.dbdesignbackend.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,11 +12,20 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
 public class HomeworkDAO {
 
+    private static final String GET_HOMEWORKS_BY_GROUP_ID = """
+            SELECT
+                homework_id,
+                homework_name,
+                homework_deadline
+            FROM get_homeworks_for_group(?);
+            """;
     private static final String CREATE_HOMEWORK = """
             SELECT create_homework(?, ?, ?, ?);
             """;
@@ -28,6 +38,30 @@ public class HomeworkDAO {
             """;
 
     private DBConnectionHolder connectionHolder;
+
+    public List<HomeworkDTO> getHomeworksByGroupId(Integer groupId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_HOMEWORKS_BY_GROUP_ID)) {
+            preparedStatement.setInt(1, groupId);
+
+            var resultSet = preparedStatement.executeQuery();
+            List<HomeworkDTO> homeworks = new ArrayList<>();
+
+            while (resultSet.next()) {
+                HomeworkDTO homeworkDTO = HomeworkDTO.builder()
+                        .id(resultSet.getInt("homework_id"))
+                        .name(resultSet.getString("homework_name"))
+                        .deadline(resultSet.getDate("homework_deadline").toLocalDate())
+                        .build();
+                homeworks.add(homeworkDTO);
+            }
+
+            return homeworks;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 
     public void createHomework(CreateHomeworkDTO createHomeworkDTO) {
         Connection connection = connectionHolder.getConnection();

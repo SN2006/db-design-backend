@@ -1,6 +1,7 @@
 package com.example.app.dbdesignbackend.dao;
 
 import com.example.app.dbdesignbackend.db.DBConnectionHolder;
+import com.example.app.dbdesignbackend.dto.EvaluateHomeworkSolutionDTO;
 import com.example.app.dbdesignbackend.dto.HomeworkDTO;
 import com.example.app.dbdesignbackend.dto.HomeworkSolutionDTO;
 import com.example.app.dbdesignbackend.dto.StudentDTO;
@@ -32,6 +33,9 @@ public class HomeworkSolutionDAO {
                 grade,
                 feedback
             FROM get_homework_solutions_by_homework_id(?);
+            """;
+    private static final String EVALUATE_HOMEWORK_SOLUTION = """
+            SELECT evaluate_homework_solution(?, ?, ?);
             """;
 
     private DBConnectionHolder connectionHolder;
@@ -71,6 +75,22 @@ public class HomeworkSolutionDAO {
             }
 
             return homeworkSolutions;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public void evaluateHomeworkSolution(
+            int homeworkSolutionId,
+            EvaluateHomeworkSolutionDTO evaluateHomeworkSolutionDTO
+    ) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(EVALUATE_HOMEWORK_SOLUTION)){
+            preparedStatement.setInt(1, homeworkSolutionId);
+            preparedStatement.setInt(2, evaluateHomeworkSolutionDTO.getGrade());
+            preparedStatement.setString(3, evaluateHomeworkSolutionDTO.getFeedback());
+            preparedStatement.executeQuery();
         } catch (SQLException e) {
             throw new BadRequestException(e.getMessage());
         }

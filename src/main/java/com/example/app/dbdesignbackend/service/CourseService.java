@@ -1,9 +1,9 @@
 package com.example.app.dbdesignbackend.service;
 
 import com.example.app.dbdesignbackend.dao.CourseDAO;
-import com.example.app.dbdesignbackend.dao.TopicDAO;
 import com.example.app.dbdesignbackend.dto.CourseDTO;
 import com.example.app.dbdesignbackend.dto.CreateCourseDTO;
+import com.example.app.dbdesignbackend.dto.GroupDTO;
 import com.example.app.dbdesignbackend.dto.UpdateCourseDTO;
 import com.example.app.dbdesignbackend.exception.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,6 @@ import java.util.List;
 public class CourseService {
 
     private CourseDAO courseDAO;
-    private TopicDAO topicDAO;
 
     public List<CourseDTO> findAll() {
         return courseDAO.getCourses();
@@ -25,6 +24,10 @@ public class CourseService {
     public CourseDTO findByName(String name) {
         return courseDAO.getCourseByName(name).orElseThrow(() ->
                 new EntityNotFoundException("Course with name " + name + " not found"));
+    }
+
+    public List<GroupDTO> findAvailableGroupsForCourse(String courseName, Integer studentId) {
+        return courseDAO.getAvailableGroupsForCourse(courseName, studentId);
     }
 
     public void createCourse(CreateCourseDTO createCourseDTO) {

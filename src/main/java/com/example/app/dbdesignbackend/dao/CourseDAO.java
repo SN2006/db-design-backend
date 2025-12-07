@@ -3,6 +3,7 @@ package com.example.app.dbdesignbackend.dao;
 import com.example.app.dbdesignbackend.db.DBConnectionHolder;
 import com.example.app.dbdesignbackend.dto.CourseDTO;
 import com.example.app.dbdesignbackend.dto.CreateCourseDTO;
+import com.example.app.dbdesignbackend.dto.GroupDTO;
 import com.example.app.dbdesignbackend.dto.TopicDTO;
 import com.example.app.dbdesignbackend.dto.UpdateCourseDTO;
 import com.example.app.dbdesignbackend.exception.BadRequestException;
@@ -47,6 +48,13 @@ public class CourseDAO {
             LEFT JOIN topic t
             ON ct.topic_id = t.topic_id
             WHERE c.course_name=?;
+            """;
+    private static final String GET_AVAILABLE_GROUPS_FOR_COURSE = """
+            SELECT
+                group_id,
+                course_name,
+                start_date
+            FROM get_available_group_by_course(?, ?);
             """;
     private static final String ADD_COURSE = """
             SELECT add_course_info(?, ?, ?::difficulty_level, ?::interval);
@@ -124,6 +132,33 @@ public class CourseDAO {
             return Optional.ofNullable(course);
         } catch (Exception e) {
             throw new RuntimeException("Error fetching course by name", e);
+        }
+    }
+
+    public List<GroupDTO> getAvailableGroupsForCourse(String courseName, int studentId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_AVAILABLE_GROUPS_FOR_COURSE)) {
+            preparedStatement.setString(1, courseName);
+            preparedStatement.setInt(2, studentId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<GroupDTO> groups = new ArrayList<>();
+            while (resultSet.next()) {
+                groups.add(
+                        GroupDTO.builder()
+                                .id(resultSet.getInt("group_id"))
+                                .course(
+                                        CourseDTO.builder()
+                                                .name(resultSet.getString("course_name"))
+                                                .build()
+                                )
+                                .startDate(resultSet.getDate("start_date").toLocalDate())
+                                .build()
+                );
+            }
+            return groups;
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching available groups for course", e);
         }
     }
 

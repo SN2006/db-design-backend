@@ -2,12 +2,15 @@ package com.example.app.dbdesignbackend.controller;
 
 import com.example.app.dbdesignbackend.dto.CourseDTO;
 import com.example.app.dbdesignbackend.dto.CreateCourseDTO;
+import com.example.app.dbdesignbackend.dto.GroupDTO;
 import com.example.app.dbdesignbackend.dto.UpdateCourseDTO;
+import com.example.app.dbdesignbackend.security.User;
 import com.example.app.dbdesignbackend.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +42,17 @@ public class CourseController {
     public ResponseEntity<CourseDTO> findByName(@PathVariable String name) {
         CourseDTO course = courseService.findByName(name);
         return ResponseEntity.ok(course);
+    }
+
+    @GetMapping("/by-name/{name}/groups")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<GroupDTO>> findAvailableGroupsForCourse(
+            @PathVariable String name,
+            Authentication authentication
+    ) {
+        User user = (User) authentication.getPrincipal();
+        List<GroupDTO> groups = courseService.findAvailableGroupsForCourse(name, user.getId());
+        return ResponseEntity.ok(groups);
     }
 
     @PostMapping

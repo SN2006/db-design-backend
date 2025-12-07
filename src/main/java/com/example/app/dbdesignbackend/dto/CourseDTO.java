@@ -18,4 +18,5 @@ public class CourseDTO {
     private String level;
     private String duration;
     private List<TopicDTO> topics;
+    private List<TeacherDTO> teachers;
 }

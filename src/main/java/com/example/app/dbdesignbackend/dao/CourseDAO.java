@@ -4,6 +4,7 @@ import com.example.app.dbdesignbackend.db.DBConnectionHolder;
 import com.example.app.dbdesignbackend.dto.CourseDTO;
 import com.example.app.dbdesignbackend.dto.CreateCourseDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
+import com.example.app.dbdesignbackend.dto.TeacherDTO;
 import com.example.app.dbdesignbackend.dto.TopicDTO;
 import com.example.app.dbdesignbackend.dto.UpdateCourseDTO;
 import com.example.app.dbdesignbackend.exception.BadRequestException;
@@ -55,6 +56,18 @@ public class CourseDAO {
                 course_name,
                 start_date
             FROM get_available_group_by_course(?, ?);
+            """;
+    private static final String GET_TEACHERS_BY_COURSE = """
+            SELECT
+                t.teacher_id,
+                t.teacher_firstname,
+                t.teacher_lastname,
+                t.teacher_email,
+                t.teacher_birthday
+            FROM teacher t
+            JOIN teacher_course tc
+            ON t.teacher_id = tc.teacher_id
+            WHERE tc.course_id=?
             """;
     private static final String ADD_COURSE = """
             SELECT add_course_info(?, ?, ?::difficulty_level, ?::interval);
@@ -159,6 +172,30 @@ public class CourseDAO {
             return groups;
         } catch (Exception e) {
             throw new RuntimeException("Error fetching available groups for course", e);
+        }
+    }
+
+    public List<TeacherDTO> getTeachersByCourse(Integer courseId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_TEACHERS_BY_COURSE)) {
+            preparedStatement.setInt(1, courseId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<TeacherDTO> teachers = new ArrayList<>();
+            while (resultSet.next()) {
+                teachers.add(
+                        TeacherDTO.builder()
+                                .id(resultSet.getInt("teacher_id"))
+                                .firstName(resultSet.getString("teacher_firstname"))
+                                .lastName(resultSet.getString("teacher_lastname"))
+                                .email(resultSet.getString("teacher_email"))
+                                .birthday(resultSet.getDate("teacher_birthday").toLocalDate())
+                                .build()
+                );
+            }
+            return teachers;
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching teachers by course", e);
         }
     }
 

@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -22,8 +23,16 @@ public class CourseService {
     }
 
     public CourseDTO findByName(String name) {
-        return courseDAO.getCourseByName(name).orElseThrow(() ->
-                new EntityNotFoundException("Course with name " + name + " not found"));
+        Optional<CourseDTO> courseDTO = courseDAO.getCourseByName(name);
+
+        if (courseDTO.isEmpty()) {
+            throw new EntityNotFoundException("Course with name " + name + " not found");
+        }
+
+        CourseDTO course = courseDTO.get();
+        course.setTeachers(courseDAO.getTeachersByCourse(course.getId()));
+
+        return course;
     }
 
     public List<GroupDTO> findAvailableGroupsForCourse(String courseName, Integer studentId) {

@@ -64,6 +64,9 @@ public class GroupDAO {
     private static final String CREATE_GROUP = """
             SELECT create_group(?, ?);
             """;
+    private static final String JOIN_GROUP = """
+            SELECT join_group(?, ?);
+            """;
 
     private DBConnectionHolder connectionHolder;
 
@@ -164,6 +167,17 @@ public class GroupDAO {
         try (PreparedStatement ps = connection.prepareStatement(CREATE_GROUP)) {
             ps.setString(1, createGroupDTO.getCourseName());
             ps.setDate(2, Date.valueOf(createGroupDTO.getStartDate()));
+            ps.execute();
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public void joinGroup(int studentId, int groupId) {
+        Connection connection = connectionHolder.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(JOIN_GROUP)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, groupId);
             ps.execute();
         } catch (SQLException e) {
             throw new BadRequestException(e.getMessage());

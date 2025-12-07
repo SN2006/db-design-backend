@@ -36,4 +36,8 @@ public class GroupService {
         groupDAO.createGroup(createGroupDTO);
     }
 
+    public void joinGroup(Integer studentId, Integer groupId) {
+        groupDAO.joinGroup(studentId, groupId);
+    }
+
 }

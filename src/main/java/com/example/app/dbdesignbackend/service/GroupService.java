@@ -25,6 +25,10 @@ public class GroupService {
         return groupDAO.getAllGroupsForTeacher(teacherId);
     }
 
+    public List<GroupDTO> findAllAvailableForStudent(Integer studentId) {
+        return groupDAO.getAvailableGroupsForStudent(studentId);
+    }
+
     public void createGroup(CreateGroupDTO createGroupDTO) {
         if (courseDAO.getCourseByName(createGroupDTO.getCourseName()).isEmpty()) {
             throw new BadRequestException("Course with name " + createGroupDTO.getCourseName() + " does not exist");

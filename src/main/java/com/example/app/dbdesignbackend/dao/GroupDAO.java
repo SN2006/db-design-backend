@@ -52,6 +52,15 @@ public class GroupDAO {
             ON g.course_id = c.course_id
             WHERE s.teacher_id=?;
             """;
+    private static final String GET_AVAILABLE_GROUPS_FOR_STUDENT = """
+            SELECT
+                course_name,
+                course_description,
+                course_level,
+                start_date,
+                group_id
+            FROM get_available_course(?);
+            """;
     private static final String CREATE_GROUP = """
             SELECT create_group(?, ?);
             """;
@@ -110,6 +119,35 @@ public class GroupDAO {
                                         .description(resultSet.getString("course_description"))
                                         .level(resultSet.getString("course_level"))
                                         .duration(resultSet.getString("course_duration"))
+                                        .build()
+                        )
+                        .build());
+            }
+
+            return groups;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public List<GroupDTO> getAvailableGroupsForStudent(int studentId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement ps = connection.prepareStatement(GET_AVAILABLE_GROUPS_FOR_STUDENT)) {
+            ps.setInt(1, studentId);
+            var resultSet = ps.executeQuery();
+
+            List<GroupDTO> groups = new ArrayList<>();
+
+            while (resultSet.next()) {
+                groups.add(GroupDTO.builder()
+                        .id(resultSet.getInt("group_id"))
+                        .startDate(resultSet.getDate("start_date").toLocalDate())
+                        .course(
+                                CourseDTO.builder()
+                                        .name(resultSet.getString("course_name"))
+                                        .description(resultSet.getString("course_description"))
+                                        .level(resultSet.getString("course_level"))
                                         .build()
                         )
                         .build());

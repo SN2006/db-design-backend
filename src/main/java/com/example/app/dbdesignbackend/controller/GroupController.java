@@ -1,5 +1,6 @@
 package com.example.app.dbdesignbackend.controller;
 
+import com.example.app.dbdesignbackend.dto.AverageGradeDTO;
 import com.example.app.dbdesignbackend.dto.CreateGroupDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
 import com.example.app.dbdesignbackend.dto.TeacherDTO;
@@ -69,6 +70,17 @@ public class GroupController {
     ) {
         List<TeacherDTO> teachers = groupService.findAllTeachersForGroup(groupId);
         return ResponseEntity.ok(teachers);
+    }
+
+    @GetMapping("/{groupId}/average-grade")
+    @PreAuthorize("hasAuthority('STUDENT')")
+    public ResponseEntity<AverageGradeDTO> findAverageGrade(
+            @PathVariable Integer groupId,
+            Authentication authentication
+    ) {
+        User user = (User) authentication.getPrincipal();
+        AverageGradeDTO averageGradeDTO = groupService.findAverageGrade(user.getId(), groupId);
+        return ResponseEntity.ok(averageGradeDTO);
     }
 
     @PostMapping

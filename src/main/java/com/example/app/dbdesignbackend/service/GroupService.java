@@ -2,6 +2,7 @@ package com.example.app.dbdesignbackend.service;
 
 import com.example.app.dbdesignbackend.dao.CourseDAO;
 import com.example.app.dbdesignbackend.dao.GroupDAO;
+import com.example.app.dbdesignbackend.dto.AverageGradeDTO;
 import com.example.app.dbdesignbackend.dto.CreateGroupDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
 import com.example.app.dbdesignbackend.dto.TeacherDTO;
@@ -36,6 +37,10 @@ public class GroupService {
 
     public List<TeacherDTO> findAllTeachersForGroup(Integer groupId) {
         return groupDAO.getTeachersByGroup(groupId);
+    }
+
+    public AverageGradeDTO findAverageGrade(Integer studentId, Integer groupId) {
+        return groupDAO.getAverageGrade(studentId, groupId);
     }
 
     public void createGroup(CreateGroupDTO createGroupDTO) {

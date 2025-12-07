@@ -1,6 +1,7 @@
 package com.example.app.dbdesignbackend.dao;
 
 import com.example.app.dbdesignbackend.db.DBConnectionHolder;
+import com.example.app.dbdesignbackend.dto.AverageGradeDTO;
 import com.example.app.dbdesignbackend.dto.CourseDTO;
 import com.example.app.dbdesignbackend.dto.CreateGroupDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
@@ -85,6 +86,9 @@ public class GroupDAO {
                 teacher_firstname,
                 teacher_lastname
             FROM get_teachers_by_group(?);
+            """;
+    private static final String GET_AVG_GRADE = """
+            SELECT avg_grade FROM get_avg_grade(?, ?);
             """;
     private static final String CREATE_GROUP = """
             SELECT create_group(?, ?);
@@ -237,6 +241,26 @@ public class GroupDAO {
             }
 
             return teachers;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public AverageGradeDTO getAverageGrade(Integer studentId, Integer groupId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement ps = connection.prepareStatement(GET_AVG_GRADE)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, groupId);
+            var resultSet = ps.executeQuery();
+
+            if (resultSet.next()) {
+                return AverageGradeDTO.builder()
+                        .averageGrade(resultSet.getDouble("avg_grade"))
+                        .build();
+            } else {
+                return AverageGradeDTO.builder().averageGrade(0.0).build();
+            }
         } catch (SQLException e) {
             throw new BadRequestException(e.getMessage());
         }

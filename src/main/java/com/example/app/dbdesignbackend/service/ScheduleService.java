@@ -18,6 +18,10 @@ public class ScheduleService {
         return scheduleDAO.getAllSchedules();
     }
 
+    public List<ScheduleDTO> findAllForGroup(Integer groupId) {
+        return scheduleDAO.getAllSchedulesForGroup(groupId);
+    }
+
     public void createSchedule(CreateScheduleDTO createScheduleDTO) {
         scheduleDAO.createSchedule(createScheduleDTO);
     }

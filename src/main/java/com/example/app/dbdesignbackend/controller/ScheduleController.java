@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,14 @@ public class ScheduleController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<ScheduleDTO>> getAllSchedules() {
         return ResponseEntity.ok(scheduleService.findAll());
+    }
+
+    @GetMapping("/by-group/{groupId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ScheduleDTO>> getAllSchedulesForGroup(
+            @PathVariable Integer groupId
+    ) {
+        return ResponseEntity.ok(scheduleService.findAllForGroup(groupId));
     }
 
     @PostMapping

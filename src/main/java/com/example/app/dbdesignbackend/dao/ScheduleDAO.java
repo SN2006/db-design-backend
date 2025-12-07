@@ -53,6 +53,17 @@ public class ScheduleDAO {
             JOIN topic top
             ON l.topic_id = top.topic_id;
             """;
+    private static final String GET_ALL_SCHEDULES_FOR_GROUP = """
+            SELECT
+                lesson_id,
+                lesson_name,
+                lesson_description,
+                schedule_date,
+                teacher_id,
+                teacher_firstname,
+                teacher_lastname
+            FROM get_schedule_by_group(?);
+            """;
     private static final String CREATE_SCHEDULE = """
             SELECT create_schedule(?, ?, ?, ?);
             """;
@@ -105,6 +116,43 @@ public class ScheduleDAO {
                                                 .lastName(resultSet.getString("teacher_lastname"))
                                                 .email(resultSet.getString("teacher_email"))
                                                 .birthday(resultSet.getDate("teacher_birthday").toLocalDate())
+                                                .build()
+                                )
+                                .build()
+                );
+            }
+
+            return schedules;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public List<ScheduleDTO> getAllSchedulesForGroup(Integer groupId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_SCHEDULES_FOR_GROUP)) {
+            preparedStatement.setInt(1, groupId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<ScheduleDTO> schedules = new ArrayList<>();
+
+            while (resultSet.next()) {
+                schedules.add(
+                        ScheduleDTO.builder()
+                                .dateTime(resultSet.getTimestamp("schedule_date").toLocalDateTime())
+                                .lesson(
+                                        LessonDTO.builder()
+                                                .id(resultSet.getInt("lesson_id"))
+                                                .name(resultSet.getString("lesson_name"))
+                                                .description(resultSet.getString("lesson_description"))
+                                                .build()
+                                )
+                                .teacher(
+                                        TeacherDTO.builder()
+                                                .id(resultSet.getInt("teacher_id"))
+                                                .firstName(resultSet.getString("teacher_firstname"))
+                                                .lastName(resultSet.getString("teacher_lastname"))
                                                 .build()
                                 )
                                 .build()

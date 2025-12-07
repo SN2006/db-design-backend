@@ -52,6 +52,23 @@ public class GroupDAO {
             ON g.course_id = c.course_id
             WHERE s.teacher_id=?;
             """;
+    private static final String GET_ALL_GROUPS_FOR_STUDENT = """
+            SELECT
+                DISTINCT g.group_id,
+                g.group_start_date,
+                g.is_finished,
+                c.course_id,
+                c.course_name,
+                c.course_description,
+                c.course_level,
+                c.course_duration
+            FROM student_group sg
+            JOIN group_ g
+            ON sg.group_id = g.group_id
+            JOIN course c
+            ON g.course_id = c.course_id
+            WHERE sg.student_id=?;
+            """;
     private static final String GET_AVAILABLE_GROUPS_FOR_STUDENT = """
             SELECT
                 course_name,
@@ -106,6 +123,38 @@ public class GroupDAO {
 
         try (PreparedStatement ps = connection.prepareStatement(GET_ALL_GROUPS_FOR_TEACHER)) {
             ps.setInt(1, teacherId);
+            var resultSet = ps.executeQuery();
+
+            List<GroupDTO> groups = new ArrayList<>();
+
+            while (resultSet.next()) {
+                groups.add(GroupDTO.builder()
+                        .id(resultSet.getInt("group_id"))
+                        .startDate(resultSet.getDate("group_start_date").toLocalDate())
+                        .isFinished(resultSet.getBoolean("is_finished"))
+                        .course(
+                                CourseDTO.builder()
+                                        .id(resultSet.getInt("course_id"))
+                                        .name(resultSet.getString("course_name"))
+                                        .description(resultSet.getString("course_description"))
+                                        .level(resultSet.getString("course_level"))
+                                        .duration(resultSet.getString("course_duration"))
+                                        .build()
+                        )
+                        .build());
+            }
+
+            return groups;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public List<GroupDTO> getAllGroupsForStudent(int studentId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement ps = connection.prepareStatement(GET_ALL_GROUPS_FOR_STUDENT)) {
+            ps.setInt(1, studentId);
             var resultSet = ps.executeQuery();
 
             List<GroupDTO> groups = new ArrayList<>();

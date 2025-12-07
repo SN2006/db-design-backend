@@ -25,6 +25,10 @@ public class GroupService {
         return groupDAO.getAllGroupsForTeacher(teacherId);
     }
 
+    public List<GroupDTO> findAllForStudent(Integer studentId) {
+        return groupDAO.getAllGroupsForStudent(studentId);
+    }
+
     public List<GroupDTO> findAllAvailableForStudent(Integer studentId) {
         return groupDAO.getAvailableGroupsForStudent(studentId);
     }

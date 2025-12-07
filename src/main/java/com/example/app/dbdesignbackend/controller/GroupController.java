@@ -51,6 +51,16 @@ public class GroupController {
         return ResponseEntity.ok(groups);
     }
 
+    @GetMapping("/student/my")
+    @PreAuthorize("hasAuthority('STUDENT')")
+    public ResponseEntity<List<GroupDTO>> findAllForStudent(
+            Authentication authentication
+    ) {
+        User user = (User) authentication.getPrincipal();
+        List<GroupDTO> groups = groupService.findAllForStudent(user.getId());
+        return ResponseEntity.ok(groups);
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> createGroup(

@@ -4,6 +4,7 @@ import com.example.app.dbdesignbackend.db.DBConnectionHolder;
 import com.example.app.dbdesignbackend.dto.CourseDTO;
 import com.example.app.dbdesignbackend.dto.CreateGroupDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
+import com.example.app.dbdesignbackend.dto.TeacherDTO;
 import com.example.app.dbdesignbackend.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -77,6 +78,13 @@ public class GroupDAO {
                 start_date,
                 group_id
             FROM get_available_course(?);
+            """;
+    private static final String GET_TEACHERS_BY_GROUP = """
+            SELECT
+                teacher_id,
+                teacher_firstname,
+                teacher_lastname
+            FROM get_teachers_by_group(?);
             """;
     private static final String CREATE_GROUP = """
             SELECT create_group(?, ?);
@@ -206,6 +214,29 @@ public class GroupDAO {
             }
 
             return groups;
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public List<TeacherDTO> getTeachersByGroup(int groupId) {
+        Connection connection = connectionHolder.getConnection();
+
+        try (PreparedStatement ps = connection.prepareStatement(GET_TEACHERS_BY_GROUP)) {
+            ps.setInt(1, groupId);
+            var resultSet = ps.executeQuery();
+
+            List<TeacherDTO> teachers = new ArrayList<>();
+
+            while (resultSet.next()) {
+                teachers.add(TeacherDTO.builder()
+                        .id(resultSet.getInt("teacher_id"))
+                        .firstName(resultSet.getString("teacher_firstname"))
+                        .lastName(resultSet.getString("teacher_lastname"))
+                        .build());
+            }
+
+            return teachers;
         } catch (SQLException e) {
             throw new BadRequestException(e.getMessage());
         }

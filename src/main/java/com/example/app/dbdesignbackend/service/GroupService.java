@@ -4,6 +4,7 @@ import com.example.app.dbdesignbackend.dao.CourseDAO;
 import com.example.app.dbdesignbackend.dao.GroupDAO;
 import com.example.app.dbdesignbackend.dto.CreateGroupDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
+import com.example.app.dbdesignbackend.dto.TeacherDTO;
 import com.example.app.dbdesignbackend.exception.BadRequestException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,10 @@ public class GroupService {
 
     public List<GroupDTO> findAllAvailableForStudent(Integer studentId) {
         return groupDAO.getAvailableGroupsForStudent(studentId);
+    }
+
+    public List<TeacherDTO> findAllTeachersForGroup(Integer groupId) {
+        return groupDAO.getTeachersByGroup(groupId);
     }
 
     public void createGroup(CreateGroupDTO createGroupDTO) {

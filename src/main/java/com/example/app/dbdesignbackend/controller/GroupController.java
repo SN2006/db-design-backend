@@ -2,6 +2,7 @@ package com.example.app.dbdesignbackend.controller;
 
 import com.example.app.dbdesignbackend.dto.CreateGroupDTO;
 import com.example.app.dbdesignbackend.dto.GroupDTO;
+import com.example.app.dbdesignbackend.dto.TeacherDTO;
 import com.example.app.dbdesignbackend.security.User;
 import com.example.app.dbdesignbackend.service.GroupService;
 import lombok.AllArgsConstructor;
@@ -59,6 +60,15 @@ public class GroupController {
         User user = (User) authentication.getPrincipal();
         List<GroupDTO> groups = groupService.findAllForStudent(user.getId());
         return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/{groupId}/teachers")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<TeacherDTO>> findAllTeachersForGroup(
+            @PathVariable Integer groupId
+    ) {
+        List<TeacherDTO> teachers = groupService.findAllTeachersForGroup(groupId);
+        return ResponseEntity.ok(teachers);
     }
 
     @PostMapping

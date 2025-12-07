@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,4 +18,5 @@ public class StudentDTO {
     private String lastName;
     private String email;
     private LocalDate birthday;
+    private List<Achievement> achievements;
 }

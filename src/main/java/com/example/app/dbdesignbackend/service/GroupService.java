@@ -54,4 +54,8 @@ public class GroupService {
         groupDAO.joinGroup(studentId, groupId);
     }
 
+    public void finishGroup(Integer groupId) {
+        groupDAO.finishGroup(groupId);
+    }
+
 }

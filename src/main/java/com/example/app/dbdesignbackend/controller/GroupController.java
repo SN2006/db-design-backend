@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,6 +101,15 @@ public class GroupController {
     ) {
         User user = (User) authentication.getPrincipal();
         groupService.joinGroup(user.getId(), groupId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{groupId}/finish")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> finishGroup(
+            @PathVariable Integer groupId
+    ) {
+        groupService.finishGroup(groupId);
         return ResponseEntity.ok().build();
     }
 

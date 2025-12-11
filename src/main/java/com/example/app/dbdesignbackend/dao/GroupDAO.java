@@ -96,6 +96,11 @@ public class GroupDAO {
     private static final String JOIN_GROUP = """
             SELECT join_group(?, ?);
             """;
+    private static final String FINISH_GROUP = """
+            UPDATE group_
+            SET is_finished=TRUE
+            WHERE group_id=?;
+            """;
 
     private DBConnectionHolder connectionHolder;
 
@@ -283,6 +288,16 @@ public class GroupDAO {
             ps.setInt(1, studentId);
             ps.setInt(2, groupId);
             ps.execute();
+        } catch (SQLException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    public void finishGroup(int groupId) {
+        Connection connection = connectionHolder.getConnection();
+        try (PreparedStatement ps = connection.prepareStatement(FINISH_GROUP)) {
+            ps.setInt(1, groupId);
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new BadRequestException(e.getMessage());
         }

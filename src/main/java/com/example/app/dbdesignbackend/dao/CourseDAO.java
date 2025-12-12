@@ -203,7 +203,7 @@ public class CourseDAO {
         Connection connection = connectionHolder.getConnection();
         Period period = Period.parse(courseDTO.getDuration());
 
-        if (period.minus(Period.ofDays(7)).isNegative()) {
+        if (period.getYears() == 0 && period.getMonths() == 0 && period.getDays() < 7) {
             throw new BadRequestException("Course duration must be at least 7 days");
         }
 
@@ -270,7 +270,7 @@ public class CourseDAO {
         Connection connection = connectionHolder.getConnection();
         Period period = Period.parse(courseDTO.getDuration());
 
-        if (period.minus(Period.ofDays(7)).isNegative()) {
+        if (period.getYears() == 0 && period.getMonths() == 0 && period.getDays() < 7) {
             throw new BadRequestException("Course duration must be at least 7 days");
         }
 

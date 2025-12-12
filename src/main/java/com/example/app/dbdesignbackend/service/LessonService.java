@@ -4,6 +4,7 @@ import com.example.app.dbdesignbackend.dao.LessonDAO;
 import com.example.app.dbdesignbackend.dto.CreateLessonDTO;
 import com.example.app.dbdesignbackend.dto.LessonDTO;
 import com.example.app.dbdesignbackend.dto.UpdateLessonDTO;
+import com.example.app.dbdesignbackend.exception.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,11 @@ public class LessonService {
 
     public List<LessonDTO> findAll() {
         return lessonDAO.getAllLessons();
+    }
+
+    public LessonDTO findByName(String name) {
+        return lessonDAO.getLessonByName(name)
+                .orElseThrow(() -> new EntityNotFoundException("Lesson with name '%s' not found".formatted(name)));
     }
 
     public void createLesson(CreateLessonDTO createLessonDTO) {

@@ -31,6 +31,14 @@ public class LessonController {
         return ResponseEntity.ok(lessonService.findAll());
     }
 
+    @GetMapping("/by-name/{name}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<LessonDTO> getLessonByName(
+            @PathVariable String name
+    ) {
+        return ResponseEntity.ok(lessonService.findByName(name));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     public ResponseEntity<Void> createLesson(
